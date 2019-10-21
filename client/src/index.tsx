@@ -1,9 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { Hello } from "./components/Hello";
+import "bootstrap/dist/css/bootstrap.css";
 
-ReactDOM.render(
-  <Hello compiler="TypeScript" framework="React" />,
-  document.getElementById("example")
-);
+import { CreateRoom } from "./pages/CreateRoom";
+
+ReactDOM.render(<CreateRoom />, document.getElementById("example"));

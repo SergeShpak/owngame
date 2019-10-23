@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -46,5 +47,6 @@ module.exports = {
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }
     ]
-  }
+  },
+  plugins: [new Dotenv()]
 };

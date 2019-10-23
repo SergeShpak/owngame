@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,5 +13,4 @@ type RoomCreateRequest struct {
 func RoomCreate(c *gin.Context) {
 	var req RoomCreateRequest
 	c.BindJSON(&req)
-	fmt.Println("From create", req)
 }

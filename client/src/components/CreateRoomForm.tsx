@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
 import "./Form.css";
+import { XHRRequest } from "../lib/xhr";
 
 interface FormControlProps {
   value: string;
@@ -26,20 +27,29 @@ const FormControl: React.FunctionComponent<FormControlProps> = props => {
 };
 
 export const CreateRoomForm = () => {
-  const [roomName, setRoomName] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [login, setLogin] = React.useState("");
+  const [roomName, setRoomName] = React.useState("MyRoom");
+  const [password, setPassword] = React.useState("P@ssw0rd");
+  const [login, setLogin] = React.useState("BuPin");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", () => {
-      console.log(xhr.responseText);
-      onCreate();
-    });
-    xhr.open("POST", "http://localhost:8080/room");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify({ name: roomName, password, login }));
+
+    XHRRequest.send({
+      method: "POST",
+      path: "room",
+      body: {
+        name: roomName,
+        password,
+        login
+      }
+    })
+      .then(resp => {
+        console.log("Response: ", resp);
+        onCreate();
+      })
+      .catch(r => {
+        throw r;
+      });
   };
 
   const onCreate = () => {

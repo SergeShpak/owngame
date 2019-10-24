@@ -1,6 +1,6 @@
 declare const process: {
   env: {
-    OWNGAME_URL: string;
+    REACT_APP_OWNGAME_URL: string;
   };
 };
 
@@ -70,8 +70,8 @@ export class XHRRequest {
   }
 
   private static getUrl(path: string): string {
-    console.log(process.env.OWNGAME_URL);
-    return `http://${process.env.OWNGAME_URL}/${path}`;
+    console.log(process.env.REACT_APP_OWNGAME_URL);
+    return `http://${process.env.REACT_APP_OWNGAME_URL}/${path}`;
   }
 
   private static encodeBody(

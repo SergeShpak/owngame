@@ -4,8 +4,9 @@ declare const process: {
   };
 };
 
-export interface XHRResponse {
+export interface XHRResponse<T> {
   status: number;
+  response?: T;
   responseText?: string;
   responseType?: XMLHttpRequestResponseType;
 }
@@ -15,15 +16,15 @@ export enum XHRRequestContentType {
   Unknown
 }
 
-export interface XHRRequestOptions {
+export interface XHRRequestOptions<R> {
   method: string;
   path: string;
   contentType?: XHRRequestContentType;
-  body?: any;
+  body?: R;
 }
 
 export class XHRRequest {
-  static async send(opts: XHRRequestOptions): Promise<XHRResponse> {
+  static async send<R, T>(opts: XHRRequestOptions<R>): Promise<XHRResponse<T>> {
     return new Promise((resolve, reject) => {
       if (opts == null) {
         throw new Error("no XHRRequestOptions passed");
@@ -42,11 +43,20 @@ export class XHRRequest {
       // onload
       xhr.onload = function() {
         if (this.status >= 200 && this.status < 300) {
-          let resp: XHRResponse = {
+          let resp: XHRResponse<T> = {
             status: this.status,
+            response: JSON.parse(this.responseText),
             responseText: this.responseText,
             responseType: this.responseType
           };
+          if (this.responseText.length > 0) {
+            try {
+              resp.response = JSON.parse(this.responseText) as T;
+            } catch (e) {
+              reject(e);
+              return;
+            }
+          }
           resolve(resp);
           return;
         }

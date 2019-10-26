@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 
 import "./Form.css";
 import { XHRRequest } from "../lib/xhr";
+import { CreateRoomRequest, CreateRoomResponse } from "../lib/types";
 
 interface FormControlProps {
   value: string;
@@ -33,7 +34,7 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    XHRRequest.send({
+    XHRRequest.send<CreateRoomRequest, CreateRoomResponse>({
       method: "POST",
       path: "room",
       body: {
@@ -43,6 +44,7 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
       }
     })
       .then(resp => {
+        console.log(resp);
         onCreate();
       })
       .catch(r => {

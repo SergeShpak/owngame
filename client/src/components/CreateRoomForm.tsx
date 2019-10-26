@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
@@ -26,7 +25,7 @@ const FormControl: React.FunctionComponent<FormControlProps> = props => {
   );
 };
 
-export const CreateRoomForm = () => {
+export const CreateRoomForm = (props: { onCreate: () => void }) => {
   const [roomName, setRoomName] = React.useState("MyRoom");
   const [password, setPassword] = React.useState("P@ssw0rd");
   const [login, setLogin] = React.useState("BuPin");
@@ -44,7 +43,6 @@ export const CreateRoomForm = () => {
       }
     })
       .then(resp => {
-        console.log("Response: ", resp);
         onCreate();
       })
       .catch(r => {
@@ -53,7 +51,7 @@ export const CreateRoomForm = () => {
   };
 
   const onCreate = () => {
-    console.log("onCreate called");
+    props.onCreate();
   };
 
   return (

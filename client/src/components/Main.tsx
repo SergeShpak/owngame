@@ -1,11 +1,18 @@
 import * as React from "react";
 
 import { CreateRoom } from "../pages/CreateRoom";
+import { New } from "../pages/New";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 export const Main: React.StatelessComponent<{}> = props => {
   return (
     <MainWrapper>
-      <CreateRoom />
+      <Router>
+        <Switch>
+          <Route exact path={"/"} component={CreateRoom} />
+          <Route path={"/new"} component={New} />
+        </Switch>
+      </Router>
     </MainWrapper>
   );
 };

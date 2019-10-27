@@ -15,10 +15,9 @@ func main() {
 	}
 	r := gin.Default()
 	r.Use(cors.Default())
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(200, "pong")
-	})
+	api := r.Group("/api/v1")
 
-	r.POST("/room", handlers.RoomCreate(dl))
+	api.POST("/room", handlers.RoomCreate(dl))
+	api.PUT("/room/:roomName", handlers.RoomJoin(dl))
 	r.Run(":8080")
 }

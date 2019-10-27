@@ -9,3 +9,16 @@ type RoomCreateRequest struct {
 type RoomCreateResponse struct {
 	Token string `json:"token" binding:"required"`
 }
+
+type RoomJoinRequest struct {
+	Login    string `json:"token" binding:"required"`
+	RoomName string `json:"roomName" binding: "required"`
+	Password string `json:"password" binding: "required"`
+}
+
+type PlayerRole int
+
+const (
+	PlayerRoleHost PlayerRole = iota + 1
+	PlayerRoleParticipant
+)

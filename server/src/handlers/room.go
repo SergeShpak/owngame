@@ -30,6 +30,7 @@ func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
 		c.JSON(http.StatusCreated, resp)
 	}
 }
+
 func roomGenerateToken() (string, error) {
 	t := make([]byte, 32)
 	if _, err := rand.Read(t); err != nil {

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 
@@ -10,6 +8,7 @@ import (
 
 	"github.com/SergeyShpak/owngame/server/src/model"
 	"github.com/SergeyShpak/owngame/server/src/types"
+	"github.com/SergeyShpak/owngame/server/src/utils"
 )
 
 func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
@@ -32,10 +31,5 @@ func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
 }
 
 func roomGenerateToken() (string, error) {
-	t := make([]byte, 32)
-	if _, err := rand.Read(t); err != nil {
-		return "", err
-	}
-	t64 := base64.StdEncoding.EncodeToString(t)
-	return t64, nil
+	return utils.GenerateToken(32)
 }

@@ -11,9 +11,13 @@ type RoomCreateResponse struct {
 }
 
 type RoomJoinRequest struct {
-	Login    string `json:"token" binding:"required"`
+	Login    string `json:"login" binding:"required"`
 	RoomName string `json:"roomName" binding: "required"`
 	Password string `json:"password" binding: "required"`
+}
+
+type RoomJoinResponse struct {
+	Token string `json:"token"`
 }
 
 type PlayerRole int

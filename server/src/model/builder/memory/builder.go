@@ -19,3 +19,11 @@ func (m *memoryDataLayerBuilder) BuildRoomLayer() (layers.RoomsDataLayer, error)
 	}
 	return l, nil
 }
+
+func (m *memoryDataLayerBuilder) BuildWebsocketConnectionLayer() (layers.WebsocketConnectionLayer, error) {
+	ws, err := NewMemoryWebsocketConnectionLayer()
+	if err != nil {
+		return nil, err
+	}
+	return ws, nil
+}

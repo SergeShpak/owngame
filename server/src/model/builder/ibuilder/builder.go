@@ -6,4 +6,5 @@ import (
 
 type DataLayerBuilder interface {
 	BuildRoomLayer() (layers.RoomsDataLayer, error)
+	BuildWebsocketConnectionLayer() (layers.WebsocketConnectionLayer, error)
 }

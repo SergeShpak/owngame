@@ -6,7 +6,8 @@ import (
 )
 
 type DataLayer struct {
-	Rooms layers.RoomsDataLayer
+	Rooms               layers.RoomsDataLayer
+	WebsocketConnection layers.WebsocketConnectionLayer
 }
 
 func NewDataLayer() (*DataLayer, error) {
@@ -16,6 +17,10 @@ func NewDataLayer() (*DataLayer, error) {
 	}
 	dl := &DataLayer{}
 	dl.Rooms, err = b.BuildRoomLayer()
+	if err != nil {
+		return nil, err
+	}
+	dl.WebsocketConnection, err = b.BuildWebsocketConnectionLayer()
 	if err != nil {
 		return nil, err
 	}

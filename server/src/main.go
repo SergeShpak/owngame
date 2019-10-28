@@ -19,5 +19,6 @@ func main() {
 
 	api.POST("/room", handlers.RoomCreate(dl))
 	api.PUT("/room/:roomName", handlers.RoomJoin(dl))
+	api.GET("/room/ws", handlers.RoomCreateWSConn(dl))
 	r.Run(":8080")
 }

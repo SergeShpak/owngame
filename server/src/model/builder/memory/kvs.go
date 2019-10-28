@@ -52,6 +52,18 @@ func (kv *keyValStore) Delete(key string) bool {
 	return true
 }
 
+func (kv *keyValStore) Pop(key string) (interface{}, bool) {
+	kv.mux.Lock()
+	val, ok := kv.vals[key]
+	if !ok {
+		kv.mux.Unlock()
+		return nil, false
+	}
+	delete(kv.vals, key)
+	kv.mux.Unlock()
+	return val, true
+}
+
 func (kv *keyValStore) Alter(key string, alter func(interface{}, bool) (interface{}, bool)) bool {
 	kv.mux.Lock()
 	val, ok := kv.vals[key]

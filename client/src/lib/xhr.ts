@@ -1,3 +1,4 @@
+// TODO: DRY!
 declare const process: {
   env: {
     REACT_APP_OWNGAME_URL: string;

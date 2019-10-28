@@ -7,3 +7,13 @@ export interface CreateRoomRequest {
 export interface CreateRoomResponse {
   token: string;
 }
+
+export interface RoomJoinRequest {
+  login: string;
+  roomName: string;
+  password: string;
+}
+
+export interface RoomJoinResponse {
+  token: string;
+}

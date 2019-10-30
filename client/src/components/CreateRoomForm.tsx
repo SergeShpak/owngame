@@ -4,13 +4,13 @@ import Form from "react-bootstrap/Form";
 
 import "./Form.css";
 import { XHRRequest } from "../lib/xhr";
-import { WS } from "../lib/ws";
 import {
   CreateRoomRequest,
   CreateRoomResponse,
   RoomJoinRequest,
   RoomJoinResponse
 } from "../lib/types";
+import localStorage from "../lib/localStorage";
 
 interface FormControlProps {
   value: string;
@@ -49,7 +49,7 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
         login
       }
     })
-      .then(resp => {
+      .then(_ => {
         XHRRequest.send<RoomJoinRequest, RoomJoinResponse>({
           method: "PUT",
           path: `api/v1/room/${roomName}`,
@@ -59,18 +59,15 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
             roomName
           }
         }).then(resp => {
-          let ws = new WS();
           if (resp.response == null) {
-            throw "response is empty";
+            throw "unexpected response";
           }
-          ws.open(`api/v1/room/ws?token=${resp.response.token}`).then(resp => {
-            console.log(resp);
-            onCreate();
-          });
+          localStorage.set("ws-token", resp.response.token);
+          onCreate();
         });
       })
-      .catch(r => {
-        throw r;
+      .catch(e => {
+        throw e;
       });
   };
 

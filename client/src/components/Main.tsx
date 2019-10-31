@@ -1,7 +1,8 @@
 import * as React from "react";
 
 import { CreateRoom } from "../pages/CreateRoom";
-import { New } from "../pages/New";
+import * as Paths from "../paths";
+import { Room } from "../pages/Room";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 export const Main: React.StatelessComponent<{}> = props => {
@@ -10,7 +11,10 @@ export const Main: React.StatelessComponent<{}> = props => {
       <Router>
         <Switch>
           <Route exact path={"/"} component={CreateRoom} />
-          <Route path={"/new"} component={New} />
+          <Route
+            path={Paths.ROOM}
+            render={props => <Room token={props.location.state.token} />}
+          />
         </Switch>
       </Router>
     </MainWrapper>

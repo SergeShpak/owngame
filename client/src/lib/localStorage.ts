@@ -1,6 +1,8 @@
 const prefix: string = "owngame-";
 
-export default class localStorage {
+export const LOCAL_STORAGE_KEY_WS_TOKEN = "ws-token";
+
+export class localStorage {
   static get(key: string): string | null {
     const pKey = this.prefixKey(key, prefix);
     const value = window.localStorage.getItem(pKey);

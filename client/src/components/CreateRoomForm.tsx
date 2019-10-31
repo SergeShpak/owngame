@@ -10,7 +10,6 @@ import {
   RoomJoinRequest,
   RoomJoinResponse
 } from "../lib/types";
-import localStorage from "../lib/localStorage";
 
 interface FormControlProps {
   value: string;
@@ -32,13 +31,18 @@ const FormControl: React.FunctionComponent<FormControlProps> = props => {
   );
 };
 
-export const CreateRoomForm = (props: { onCreate: () => void }) => {
+export const CreateRoomForm = (props: {
+  onCreate: () => void;
+  setToken: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [roomName, setRoomName] = React.useState("MyRoom");
   const [password, setPassword] = React.useState("P@ssw0rd");
   const [login, setLogin] = React.useState("BuPin");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log("In onSubmit");
 
     XHRRequest.send<CreateRoomRequest, CreateRoomResponse>({
       method: "POST",
@@ -47,6 +51,9 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
         name: roomName,
         password,
         login
+      },
+      url: {
+        protocol: "http"
       }
     })
       .then(_ => {
@@ -57,12 +64,15 @@ export const CreateRoomForm = (props: { onCreate: () => void }) => {
             login,
             password,
             roomName
+          },
+          url: {
+            protocol: "http"
           }
         }).then(resp => {
           if (resp.response == null) {
             throw "unexpected response";
           }
-          localStorage.set("ws-token", resp.response.token);
+          props.setToken(resp.response.token);
           onCreate();
         });
       })

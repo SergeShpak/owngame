@@ -1,3 +1,5 @@
+import { getUrl, getUrlOpts } from "./utils";
+
 // TODO: DRY!
 declare const process: {
   env: {
@@ -22,6 +24,7 @@ export interface XHRRequestOptions<R> {
   path: string;
   contentType?: XHRRequestContentType;
   body?: R;
+  url?: getUrlOpts;
 }
 
 export class XHRRequest {
@@ -68,7 +71,7 @@ export class XHRRequest {
         rejectFn(this, reject);
       };
       // compose and send
-      const url = XHRRequest.getUrl(opts.path);
+      const url = getUrl(opts.path, opts.url);
       xhr.open(opts.method, url);
       const headers = new XHRRequestHeaders().addContentType(opts.contentType);
       headers.forEach((key, string) => {
@@ -78,11 +81,6 @@ export class XHRRequest {
       let bodyEnc = XHRRequest.encodeBody(opts.body, opts.contentType);
       xhr.send(bodyEnc);
     });
-  }
-
-  private static getUrl(path: string): string {
-    console.log(process.env.REACT_APP_OWNGAME_URL);
-    return `http://${process.env.REACT_APP_OWNGAME_URL}/${path}`;
   }
 
   private static encodeBody(

@@ -70,7 +70,7 @@ export const CreateRoomForm = (props: {
           }
         }).then(resp => {
           if (resp.response == null) {
-            throw "unexpected response";
+            throw new Error("unexpected response");
           }
           props.setToken(resp.response.token);
           onCreate();

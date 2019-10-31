@@ -32,7 +32,7 @@ function getUrlDefaultOpts(opts?: getUrlOpts): getUrlOptsInternal {
   }
   let optsInternal: getUrlOptsInternal = {
     protocol:
-      opts.protocol == null || opts.protocol.length == 0
+      opts.protocol == null || opts.protocol.length === 0
         ? "https"
         : opts.protocol,
     searchParams: searchParams

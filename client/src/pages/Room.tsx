@@ -1,6 +1,5 @@
 import * as React from "react";
 import { WS } from "../lib/ws";
-import { createHook } from "async_hooks";
 
 interface RoomProps {
   token: string;
@@ -12,7 +11,7 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
   if (props.token == null || props.token.length === 0) {
     return <h1>No token found</h1>;
   }
-  if (connStatus == "loading") {
+  if (connStatus === "loading") {
     let conn = new WS();
     conn
       .open("/api/v1/room/ws", onWSMessage, [
@@ -34,7 +33,7 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
     case "loading":
       return <h1>Loading...</h1>;
     default:
-      throw `state ${connStatus} is unknown`;
+      throw new Error(`state ${connStatus} is unknown`);
   }
 };
 

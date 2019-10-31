@@ -50,7 +50,7 @@ func RoomJoin(dl *model.DataLayer) func(c *gin.Context) {
 func RoomCreateWSConn(dl *model.DataLayer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		token := c.Query("token")
-		roomName, login, err := dl.WebsocketConnection.EstablishConnection(token)
+		_, login, err := dl.WebsocketConnection.EstablishConnection(token)
 		if err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -62,7 +62,13 @@ func RoomCreateWSConn(dl *model.DataLayer) func(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		client.WriteMsg(fmt.Sprintf("Hi! Room name: %s, login: %s", roomName, login))
+		wsMsg, err := ws.NewMsgParticipants([]string{login})
+		if err != nil {
+			log.Printf("[ERROR]: %v", err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		client.WriteMsg(wsMsg)
 	}
 }
 

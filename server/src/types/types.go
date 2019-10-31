@@ -26,3 +26,18 @@ const (
 	PlayerRoleHost PlayerRole = iota + 1
 	PlayerRoleParticipant
 )
+
+type WSMessageType string
+
+const (
+	WSMessageTypeParticipants = "participants"
+)
+
+type WSMessage struct {
+	Type    string `json:"type"`
+	Message string `json:"message"`
+}
+
+type WSMsgParticipants struct {
+	Logins []string `json:"logins"`
+}

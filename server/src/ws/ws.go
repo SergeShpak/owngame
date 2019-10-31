@@ -25,8 +25,8 @@ func UpgradeConnection(w http.ResponseWriter, req *http.Request, responseHeader 
 	return client, nil
 }
 
-func (c *Client) WriteMsg(msg string) error {
-	return c.conn.WriteMessage(websocket.TextMessage, []byte(msg))
+func (c *Client) WriteMsg(msg []byte) error {
+	return c.conn.WriteMessage(websocket.TextMessage, msg)
 }
 
 func (c *Client) Close() error {

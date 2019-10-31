@@ -17,3 +17,14 @@ export interface RoomJoinRequest {
 export interface RoomJoinResponse {
   token: string;
 }
+
+export interface WebsocketMessage {
+  type: string;
+  message: string;
+}
+
+export const WS_MSG_TYPE_PARTICIPANTS = "participants";
+
+export interface WSParticipants {
+  logins: string[];
+}

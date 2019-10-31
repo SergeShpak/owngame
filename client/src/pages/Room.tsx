@@ -1,5 +1,11 @@
 import * as React from "react";
 import { WS } from "../lib/ws";
+import {
+  WebsocketMessage,
+  WS_MSG_TYPE_PARTICIPANTS,
+  WSParticipants
+} from "../lib/types";
+import { Room as RoomComponent } from "../components/Room";
 
 interface RoomProps {
   token: string;
@@ -7,6 +13,24 @@ interface RoomProps {
 
 export const Room: React.StatelessComponent<RoomProps> = props => {
   const [connStatus, setConnStatus] = React.useState("loading");
+  const [participants, setParticipants] = React.useState<string[]>([]);
+
+  const onWSMessage = (data: MessageEvent) => {
+    console.log("Received msg: ", data.data);
+    const msg: WebsocketMessage = JSON.parse(data.data);
+    switch (msg.type) {
+      case WS_MSG_TYPE_PARTICIPANTS:
+        const participants: WSParticipants = JSON.parse(atob(msg.message));
+        updateParticipants(participants);
+        break;
+      default:
+        throw new Error(`ws message type ${msg.type} is unknown`);
+    }
+  };
+
+  const updateParticipants = (msg: WSParticipants) => {
+    setParticipants(msg.logins);
+  };
 
   if (props.token == null || props.token.length === 0) {
     return <h1>No token found</h1>;
@@ -27,7 +51,7 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
   }
   switch (connStatus) {
     case "succeeded":
-      return <h1>New room! {props.token}</h1>;
+      return <RoomComponent participants={participants} />;
     case "failed":
       return <h1>Connection failed</h1>;
     case "loading":
@@ -36,7 +60,3 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
       throw new Error(`state ${connStatus} is unknown`);
   }
 };
-
-function onWSMessage(data: MessageEvent): void {
-  console.log(data);
-}

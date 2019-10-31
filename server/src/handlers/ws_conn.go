@@ -71,8 +71,8 @@ func generateWebsocketToken(roomName string, login string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	roomName64 := base64.StdEncoding.EncodeToString([]byte(roomName))
-	login64 := base64.StdEncoding.EncodeToString([]byte(login))
-	token := fmt.Sprintf("%s:%s:%s", nonce, roomName64, login64)
+	roomName64 := base64.RawURLEncoding.EncodeToString([]byte(roomName))
+	login64 := base64.RawURLEncoding.EncodeToString([]byte(login))
+	token := fmt.Sprintf("%s.%s.%s", nonce, roomName64, login64)
 	return token, nil
 }

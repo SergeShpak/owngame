@@ -10,6 +10,6 @@ func GenerateToken(len int) (string, error) {
 	if _, err := rand.Read(t); err != nil {
 		return "", err
 	}
-	t64 := base64.StdEncoding.EncodeToString(t)
+	t64 := base64.RawURLEncoding.EncodeToString(t)
 	return t64, nil
 }

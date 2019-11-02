@@ -57,6 +57,20 @@ func (m *memoryRoomLayer) JoinRoom(roomName string, login string) (types.PlayerR
 	return types.PlayerRoleParticipant, fmt.Errorf("failed to join the room %s", roomName)
 }
 
+func (m *memoryRoomLayer) GetParticipants(roomName string) ([]string, error) {
+	p, ok := m.roomPlayers.GetPlayers(roomName)
+	if !ok {
+		return nil, fmt.Errorf("room %s not found", roomName)
+	}
+	playersCount := len(p.Players) + 1
+	ps := make([]string, playersCount)
+	for i, player := range p.Players {
+		ps[i] = player
+	}
+	ps[len(p.Players)] = p.Host
+	return ps, nil
+}
+
 type rooms keyValStore
 
 func newRooms() *rooms {
@@ -107,19 +121,19 @@ func newPlayers() *players {
 	return p
 }
 
-func (rp *roomPlayers) PutHost(roomName string, hostToken string) bool {
+func (rp *roomPlayers) PutHost(roomName string, login string) bool {
 	kvs := (*keyValStore)(rp)
 	ok := kvs.Alter(roomName, func(playersIface interface{}, exist bool) (interface{}, bool) {
 		if !exist {
 			p := newPlayers()
-			p.Host = hostToken
+			p.Host = login
 			return p, true
 		}
 		p := playersIface.(*players)
 		if len(p.Host) != 0 {
 			return nil, false
 		}
-		p.Host = hostToken
+		p.Host = login
 		return p, true
 	})
 	return ok
@@ -139,4 +153,14 @@ func (rp *roomPlayers) AddParticipant(meta *roomMeta, login string) bool {
 		return p, true
 	})
 	return ok
+}
+
+func (rp *roomPlayers) GetPlayers(roomName string) (*players, bool) {
+	kvs := (*keyValStore)(rp)
+	pIface, ok := kvs.Get(roomName)
+	if !ok {
+		return nil, false
+	}
+	players := pIface.(*players)
+	return players, true
 }

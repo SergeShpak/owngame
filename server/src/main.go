@@ -16,9 +16,9 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 	api := r.Group("/api/v1")
-
+	wsConn := handlers.NewWsConn(dl)
 	api.POST("/room", handlers.RoomCreate(dl))
-	api.PUT("/room/:roomName", handlers.RoomJoin(dl))
-	api.GET("/room/ws", handlers.RoomCreateWSConn(dl))
+	api.PUT("/room/:roomName", wsConn.RoomJoin())
+	api.GET("/room/ws", wsConn.RoomCreateWSConn())
 	r.Run(":8080")
 }

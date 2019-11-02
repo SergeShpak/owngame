@@ -14,16 +14,27 @@ import (
 	"github.com/SergeyShpak/owngame/server/src/ws"
 )
 
-func RoomJoin(dl *model.DataLayer) func(c *gin.Context) {
+type WsConn struct {
+	dl *model.DataLayer
+}
+
+func NewWsConn(dl *model.DataLayer) *WsConn {
+	wsConn := &WsConn{
+		dl: dl,
+	}
+	return wsConn
+}
+
+func (conn *WsConn) RoomJoin() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req types.RoomJoinRequest
 		c.BindJSON(&req)
-		if err := dl.Rooms.CheckPassword(req.RoomName, req.Password); err != nil {
+		if err := conn.dl.Rooms.CheckPassword(req.RoomName, req.Password); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		_, err := dl.Rooms.JoinRoom(req.RoomName, req.Login)
+		_, err := conn.dl.Rooms.JoinRoom(req.RoomName, req.Login)
 		if err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -35,7 +46,11 @@ func RoomJoin(dl *model.DataLayer) func(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		if err := dl.WebsocketConnection.PrepareConnection(token, req.RoomName, req.Login); err != nil {
+		connMeta := &types.ConnectionMeta{
+			RoomName: req.RoomName,
+			Login:    req.Login,
+		}
+		if err := conn.dl.WebsocketConnection.PrepareConnection(token, connMeta); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
@@ -47,10 +62,10 @@ func RoomJoin(dl *model.DataLayer) func(c *gin.Context) {
 	}
 }
 
-func RoomCreateWSConn(dl *model.DataLayer) func(c *gin.Context) {
+func (conn *WsConn) RoomCreateWSConn() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		token := c.Query("token")
-		_, login, err := dl.WebsocketConnection.EstablishConnection(token)
+		connMeta, err := conn.dl.WebsocketConnection.GetConnectionMeta(token)
 		if err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -62,14 +77,36 @@ func RoomCreateWSConn(dl *model.DataLayer) func(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		wsMsg, err := ws.NewMsgParticipants([]string{login})
-		if err != nil {
+		conn.dl.WebsocketConnection.EstablishConnection(client, connMeta)
+		if err := conn.BroadcastParticipantList(connMeta.RoomName); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		client.WriteMsg(wsMsg)
 	}
+}
+
+func (conn *WsConn) BroadcastParticipantList(roomName string) error {
+	participants, err := conn.dl.Rooms.GetParticipants(roomName)
+	if err != nil {
+		return err
+	}
+	wsMsg, err := ws.NewMsgParticipants(participants)
+	if err != nil {
+		return err
+	}
+	for _, p := range participants {
+		connMeta := &types.ConnectionMeta{
+			RoomName: roomName,
+			Login:    p,
+		}
+		c, err := conn.dl.WebsocketConnection.GetConnection(connMeta)
+		if err != nil {
+			// TODO(SSH): add logging
+		}
+		c.WriteMsg(wsMsg)
+	}
+	return nil
 }
 
 func generateWebsocketToken(roomName string, login string) (string, error) {

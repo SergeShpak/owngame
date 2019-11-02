@@ -27,6 +27,11 @@ const (
 	PlayerRoleParticipant
 )
 
+type ConnectionMeta struct {
+	RoomName string
+	Login    string
+}
+
 type WSMessageType string
 
 const (

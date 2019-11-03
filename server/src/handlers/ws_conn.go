@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/base64"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -10,7 +8,6 @@ import (
 
 	"github.com/SergeyShpak/owngame/server/src/model"
 	"github.com/SergeyShpak/owngame/server/src/types"
-	"github.com/SergeyShpak/owngame/server/src/utils"
 	"github.com/SergeyShpak/owngame/server/src/ws"
 )
 
@@ -40,7 +37,7 @@ func (conn *WsConn) RoomJoin() func(c *gin.Context) {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		token, err := generateWebsocketToken(req.RoomName, req.Login)
+		token, err := generateRoomToken(req.RoomName, req.Login)
 		if err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -107,15 +104,4 @@ func (conn *WsConn) BroadcastParticipantList(roomName string) error {
 		c.WriteMsg(wsMsg)
 	}
 	return nil
-}
-
-func generateWebsocketToken(roomName string, login string) (string, error) {
-	nonce, err := utils.GenerateToken(16)
-	if err != nil {
-		return "", err
-	}
-	roomName64 := base64.RawURLEncoding.EncodeToString([]byte(roomName))
-	login64 := base64.RawURLEncoding.EncodeToString([]byte(login))
-	token := fmt.Sprintf("%s.%s.%s", nonce, roomName64, login64)
-	return token, nil
 }

@@ -22,12 +22,12 @@ func NewMemoryRoomLayer() (layers.RoomsDataLayer, error) {
 
 func (m *memoryRoomLayer) CreateRoom(r *types.RoomCreateRequest, roomToken string) error {
 	rMeta := &roomMeta{
-		Name:            r.Name,
+		Name:            r.RoomName,
 		Password:        r.Password,
 		MaxPlayersCount: 3,
 	}
 	if ok := m.rooms.PutRoomMeta(rMeta); !ok {
-		return fmt.Errorf("room %s already exists", r.Name)
+		return fmt.Errorf("room %s already exists", r.RoomName)
 	}
 	return nil
 }
@@ -163,4 +163,54 @@ func (rp *roomPlayers) GetPlayers(roomName string) (*players, bool) {
 	}
 	players := pIface.(*players)
 	return players, true
+}
+
+type roomAdmin keyValStore
+
+func newRoomAdmin() *roomAdmin {
+	ra := (roomAdmin)(*newKeyValStore())
+	return &ra
+}
+
+func (ra *roomAdmin) PutAdmin(roomName string, adminToken string) bool {
+	kvs := (*keyValStore)(ra)
+	ok := kvs.Alter(roomName, func(tokensIface interface{}, exist bool) (interface{}, bool) {
+		if !exist {
+			t := make([]string, 1)
+			t[0] = adminToken
+			return t, true
+		}
+		t := tokensIface.([]string)
+		for _, at := range t {
+			if adminToken == at {
+				return t, true
+			}
+		}
+		t = append(t, adminToken)
+		return t, true
+	})
+	return ok
+}
+
+func (ra *roomAdmin) DeleteAdmin(roomName string, adminToken string) bool {
+	t, ok := ra.GetAdmins(roomName)
+	if !ok {
+		return false
+	}
+	for i, at := range t {
+		if adminToken == at {
+			t = append(t[:i], t[i+1:]...)
+		}
+	}
+	return true
+}
+
+func (ra *roomAdmin) GetAdmins(roomName string) ([]string, bool) {
+	kvs := (*keyValStore)(ra)
+	tokensIface, ok := kvs.Get(roomName)
+	if !ok {
+		return nil, false
+	}
+	t := tokensIface.([]string)
+	return t, true
 }

@@ -8,14 +8,13 @@ import (
 
 	"github.com/SergeyShpak/owngame/server/src/model"
 	"github.com/SergeyShpak/owngame/server/src/types"
-	"github.com/SergeyShpak/owngame/server/src/utils"
 )
 
 func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req types.RoomCreateRequest
 		c.BindJSON(&req)
-		roomToken, err := roomGenerateToken()
+		roomToken, err := generateRoomToken(req.RoomName, req.Login)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("an error occurred"))
 		}
@@ -28,8 +27,4 @@ func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
 		}
 		c.JSON(http.StatusCreated, resp)
 	}
-}
-
-func roomGenerateToken() (string, error) {
-	return utils.GenerateToken(32)
 }

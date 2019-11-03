@@ -32,8 +32,4 @@ export class WS {
       };
     });
   }
-
-  private static composeURL(path: string): string {
-    return `https://${process.env.REACT_APP_OWNGAME_URL}/${path}`;
-  }
 }

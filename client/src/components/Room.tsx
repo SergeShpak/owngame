@@ -1,7 +1,8 @@
 import * as React from "react";
+import { Participant } from "../lib/types";
 
 interface RoomProps {
-  participants: string[];
+  participants: Participant[];
 }
 
 export const Room: React.StatelessComponent<RoomProps> = props => {
@@ -9,7 +10,11 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
     <div>
       <ul>
         {props.participants.map(p => {
-          return <li>{p}</li>;
+          return (
+            <li>
+              {p.login}: {p.role}
+            </li>
+          );
         })}
       </ul>
     </div>

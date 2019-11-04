@@ -1,5 +1,5 @@
 export interface CreateRoomRequest {
-  name: string;
+  roomName: string;
   password: string;
   login: string;
 }
@@ -23,8 +23,18 @@ export interface WebsocketMessage {
   message: string;
 }
 
+enum ParticipantRole {
+  Host = 1,
+  Participant
+}
+
+export interface Participant {
+  login: string;
+  role: ParticipantRole;
+}
+
 export const WS_MSG_TYPE_PARTICIPANTS = "participants";
 
 export interface WSParticipants {
-  logins: string[];
+  participants: Participant[];
 }

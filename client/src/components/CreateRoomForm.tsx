@@ -4,12 +4,7 @@ import Form from "react-bootstrap/Form";
 
 import "./Form.css";
 import { XHRRequest } from "../lib/xhr";
-import {
-  CreateRoomRequest,
-  CreateRoomResponse,
-  RoomJoinRequest,
-  RoomJoinResponse
-} from "../lib/types";
+import { CreateRoomRequest, CreateRoomResponse } from "../lib/types";
 
 interface FormControlProps {
   value: string;
@@ -48,7 +43,7 @@ export const CreateRoomForm = (props: {
       method: "POST",
       path: "api/v1/room",
       body: {
-        name: roomName,
+        roomName,
         password,
         login
       },
@@ -56,25 +51,12 @@ export const CreateRoomForm = (props: {
         protocol: "http"
       }
     })
-      .then(_ => {
-        XHRRequest.send<RoomJoinRequest, RoomJoinResponse>({
-          method: "PUT",
-          path: `api/v1/room/${roomName}`,
-          body: {
-            login,
-            password,
-            roomName
-          },
-          url: {
-            protocol: "http"
-          }
-        }).then(resp => {
-          if (resp.response == null) {
-            throw new Error("unexpected response");
-          }
-          props.setToken(resp.response.token);
-          onCreate();
-        });
+      .then(resp => {
+        if (resp.response == null) {
+          throw new Error("unexpected response");
+        }
+        props.setToken(resp.response.token);
+        onCreate();
       })
       .catch(e => {
         throw e;

@@ -3,7 +3,8 @@ import { WS } from "../lib/ws";
 import {
   WebsocketMessage,
   WS_MSG_TYPE_PARTICIPANTS,
-  WSParticipants
+  WSParticipants,
+  Participant
 } from "../lib/types";
 import { Room as RoomComponent } from "../components/Room";
 
@@ -13,7 +14,7 @@ interface RoomProps {
 
 export const Room: React.StatelessComponent<RoomProps> = props => {
   const [connStatus, setConnStatus] = React.useState("loading");
-  const [participants, setParticipants] = React.useState<string[]>([]);
+  const [participants, setParticipants] = React.useState<Participant[]>([]);
 
   const onWSMessage = (data: MessageEvent) => {
     console.log("Received msg: ", data.data);
@@ -29,7 +30,7 @@ export const Room: React.StatelessComponent<RoomProps> = props => {
   };
 
   const updateParticipants = (msg: WSParticipants) => {
-    setParticipants(msg.logins);
+    setParticipants(msg.participants);
   };
 
   if (props.token == null || props.token.length === 0) {

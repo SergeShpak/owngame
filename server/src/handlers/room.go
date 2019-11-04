@@ -22,6 +22,10 @@ func RoomCreate(model *model.DataLayer) func(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("an error occurred"))
 			return
 		}
+		if err := prepareConnection(model, roomToken, req.RoomName, req.Login); err != nil {
+			c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("an error occurred"))
+			return
+		}
 		resp := types.RoomCreateResponse{
 			Token: roomToken,
 		}

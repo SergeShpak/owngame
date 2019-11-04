@@ -1,7 +1,7 @@
 package types
 
 type RoomCreateRequest struct {
-	RoomName string `json:"name" binding:"required"`
+	RoomName string `json:"roomName" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Login    string `json:"login" binding:"required"`
 }
@@ -28,6 +28,11 @@ type ConnectionMeta struct {
 	Login    string
 }
 
+type Participant struct {
+	Login string     `json:"login"`
+	Role  PlayerRole `json:"role"`
+}
+
 type WSMessageType string
 
 const (
@@ -39,6 +44,6 @@ type WSMessage struct {
 	Message string `json:"message"`
 }
 
-type WSMsgParticipants struct {
-	Logins []string `json:"logins"`
+type WSMsgParticipant struct {
+	Participants []Participant `json:"participants"`
 }

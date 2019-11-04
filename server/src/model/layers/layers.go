@@ -9,7 +9,7 @@ type RoomsDataLayer interface {
 	CreateRoom(r *types.RoomCreateRequest, hostToken string) error
 	CheckPassword(roomName string, password string) error
 	JoinRoom(roomName string, login string) (types.PlayerRole, error)
-	GetParticipants(roomName string) ([]string, error)
+	GetParticipants(roomName string) ([]types.Participant, error)
 }
 
 type WebsocketConnectionLayer interface {

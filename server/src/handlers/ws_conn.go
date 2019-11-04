@@ -26,6 +26,7 @@ func (conn *WsConn) RoomJoin() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req types.RoomJoinRequest
 		c.BindJSON(&req)
+		log.Println(req)
 		if err := conn.dl.Rooms.CheckPassword(req.RoomName, req.Password); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusUnauthorized)
@@ -43,11 +44,7 @@ func (conn *WsConn) RoomJoin() func(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		connMeta := &types.ConnectionMeta{
-			RoomName: req.RoomName,
-			Login:    req.Login,
-		}
-		if err := conn.dl.WebsocketConnection.PrepareConnection(token, connMeta); err != nil {
+		if err := prepareConnection(conn.dl, token, req.RoomName, req.Login); err != nil {
 			log.Printf("[ERROR]: %v", err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
@@ -95,7 +92,7 @@ func (conn *WsConn) BroadcastParticipantList(roomName string) error {
 	for _, p := range participants {
 		connMeta := &types.ConnectionMeta{
 			RoomName: roomName,
-			Login:    p,
+			Login:    p.Login,
 		}
 		c, err := conn.dl.WebsocketConnection.GetConnection(connMeta)
 		if err != nil {

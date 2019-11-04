@@ -10,12 +10,14 @@ import (
 type memoryRoomLayer struct {
 	rooms       *rooms
 	roomPlayers *roomPlayers
+	roomAdmins  *roomAdmin
 }
 
 func NewMemoryRoomLayer() (layers.RoomsDataLayer, error) {
 	m := &memoryRoomLayer{
 		rooms:       newRooms(),
 		roomPlayers: newRoomPlayers(),
+		roomAdmins:  newRoomAdmin(),
 	}
 	return m, nil
 }
@@ -29,13 +31,19 @@ func (m *memoryRoomLayer) CreateRoom(r *types.RoomCreateRequest, roomToken strin
 	if ok := m.rooms.PutRoomMeta(rMeta); !ok {
 		return fmt.Errorf("room %s already exists", r.RoomName)
 	}
+	if ok := m.roomAdmins.PutAdmin(r.RoomName, roomToken); !ok {
+		return fmt.Errorf("could not put an admin for the room %s", r.RoomName)
+	}
+	if ok := m.roomPlayers.PutHost(r.RoomName, r.Login); !ok {
+		return fmt.Errorf("could not promote user %s to the admin role of the room %s", r.RoomName)
+	}
 	return nil
 }
 
 func (m *memoryRoomLayer) CheckPassword(roomName string, password string) error {
 	meta, ok := m.rooms.GetRoomMeta(roomName)
 	if !ok {
-		return fmt.Errorf("rooms %s not found", roomName)
+		return fmt.Errorf("room %s not found", roomName)
 	}
 	if meta.Password != password {
 		return fmt.Errorf("password validation for room %s failed, expected: %s, actual: %s", roomName, meta.Password, password)
@@ -57,17 +65,23 @@ func (m *memoryRoomLayer) JoinRoom(roomName string, login string) (types.PlayerR
 	return types.PlayerRoleParticipant, fmt.Errorf("failed to join the room %s", roomName)
 }
 
-func (m *memoryRoomLayer) GetParticipants(roomName string) ([]string, error) {
+func (m *memoryRoomLayer) GetParticipants(roomName string) ([]types.Participant, error) {
 	p, ok := m.roomPlayers.GetPlayers(roomName)
 	if !ok {
 		return nil, fmt.Errorf("room %s not found", roomName)
 	}
 	playersCount := len(p.Players) + 1
-	ps := make([]string, playersCount)
+	ps := make([]types.Participant, playersCount)
 	for i, player := range p.Players {
-		ps[i] = player
+		ps[i] = types.Participant{
+			Login: player,
+			Role:  types.PlayerRoleParticipant,
+		}
 	}
-	ps[len(p.Players)] = p.Host
+	ps[len(p.Players)] = types.Participant{
+		Login: p.Host,
+		Role:  types.PlayerRoleHost,
+	}
 	return ps, nil
 }
 

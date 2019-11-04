@@ -7,9 +7,9 @@ import (
 	"github.com/SergeyShpak/owngame/server/src/types"
 )
 
-func NewMsgParticipants(logins []string) ([]byte, error) {
-	msg := types.WSMsgParticipants{
-		Logins: logins,
+func NewMsgParticipants(participants []types.Participant) ([]byte, error) {
+	msg := types.WSMsgParticipant{
+		Participants: participants,
 	}
 	wsMsg, err := newWsMsg(types.WSMessageTypeParticipants, msg)
 	if err != nil {
